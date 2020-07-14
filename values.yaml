@@ -9,7 +9,7 @@
 image:
   registry: docker.io
   repository: nats-streaming
-  tag: 0.16.2
+  tag: 0.18.0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -30,7 +30,7 @@ replicaCount: 3
 #
 
 # Cluster ID (default: test-cluster)
-clusterID: "test-cluster"
+clusterID: "nats-streaming-cluster"
   
 # Connect to this external NATS Server URL
 natsSvc: "nats://nats:4222"
@@ -123,9 +123,9 @@ persistence:
 
   volume:
     # If false, emptyDir will be used as a volume.
-    enabled: false
-    # size: 10Gi
-    # storageClass: ""
+    enabled: true
+    size: 10Gi
+    storageClass: standard
 
 ## NATS Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -177,13 +177,13 @@ statefulset:
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 256Mi
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
 ## Configure extra options for liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes)
@@ -246,11 +246,11 @@ monitoring:
 ##
 ## ref: https://github.com/nats-io/prometheus-nats-exporter
 metrics:
-  enabled: false
+  enabled: true
   image:
     registry: docker.io
     repository: synadia/prometheus-nats-exporter
-    tag: 0.1.0
+    tag: 0.6.2
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -270,11 +270,10 @@ metrics:
     prometheus.io/port: "7777"
   ## Metrics exporter flags
   args:
-    # TODO: Uncomment these args once synadia/prometheus-nats-exporter adds NATS Streaming support
-    # - -serverz
-    # - -storez
-    # - -clientz
-    # - -channelz
+  - -serverz
+  - -storez
+  - -clientz
+  - -channelz
 
 ## Sidecars
 sidecars:
